@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌙 for Indu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #f5ecd6;
+    --cream-dim: #d8cdae;
+    --gold: #f2c879;
+    --gold-deep: #caa051;
+    --lavender: #d8dcf0;
+    --lavender-dim: #a9b0d6;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    min-height:100%;
+    font-family:'Quicksand', 'Segoe UI', sans-serif;
+    background:radial-gradient(ellipse at top, #182648 0%, #0b1226 45%, #04060f 100%);
+    color:var(--lavender);
+    overflow-x:hidden;
+  }
+
+  .vignette{
+    position:fixed; inset:0;
+    z-index:2;
+    pointer-events:none;
+    box-shadow:inset 0 0 160px 60px rgba(0,0,0,0.6);
+  }
+
+  .site-stars{
+    position:fixed; inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .site-star{
+    position:absolute;
+    background:#fff;
+    border-radius:50%;
+    animation:twinkleGate ease-in-out infinite;
+  }
+  @keyframes twinkleGate{
+    0%,100%{ opacity:0.12; }
+    50%{ opacity:0.9; }
+  }
+
+  .moonfield{
+    position:fixed; inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .phase{
+    position:absolute;
+    border-radius:50%;
+    background:var(--cream-dim);
+    opacity:0.1;
+    animation:driftPhase ease-in-out infinite;
+  }
+  @keyframes driftPhase{
+    0%,100%{ transform:translateY(0) rotate(0deg); opacity:0.06; }
+    50%{ transform:translateY(-14px) rotate(8deg); opacity:0.16; }
+  }
+
+  .screen{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:44px 22px;
+  }
+  .screen.hidden{ display:none; }
+
+  /* iris transition overlay */
+  #iris{
+    position:fixed; inset:0;
+    z-index:10;
+    background:#000;
+    clip-path:circle(0% at 50% 50%);
+    pointer-events:none;
+  }
+  #iris.closing{
+    clip-path:circle(150% at 50% 50%);
+    transition:clip-path 0.55s cubic-bezier(.7,0,.3,1);
+  }
+  #iris.opening{
+    clip-path:circle(0% at 50% 50%);
+    transition:clip-path 0.55s cubic-bezier(.7,0,.3,1);
+  }
+
+  /* Gate */
+  #gate{
+    flex-direction:column;
+    gap:26px;
+    cursor:pointer;
+    background:radial-gradient(ellipse at 50% 36%, #2c5a8a 0%, #1c4269 28%, #12294a 52%, #0a1a33 78%, #050e1f 100%);
+    overflow:hidden;
+  }
+  .gate-stars{
+    position:absolute; inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+  .gate-star{
+    position:absolute;
+    background:#fff;
+    border-radius:50%;
+    animation:twinkleGate ease-in-out infinite;
+  }
+  .horizon{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:32%;
+    z-index:1;
+    pointer-events:none;
+  }
+  .horizon .ridge{
+    position:absolute;
+    left:0; right:0; bottom:0;
+  }
+  .horizon .ridge.back{
+    height:100%;
+    background:#0d1f38;
+    clip-path:polygon(0% 60%, 8% 40%, 18% 55%, 30% 30%, 42% 50%, 55% 25%, 68% 48%, 80% 32%, 92% 52%, 100% 38%, 100% 100%, 0% 100%);
+    opacity:0.85;
+  }
+  .horizon .ridge.front{
+    height:70%;
+    background:#081527;
+    clip-path:polygon(0% 70%, 12% 50%, 24% 62%, 38% 38%, 50% 58%, 64% 34%, 78% 56%, 90% 42%, 100% 60%, 100% 100%, 0% 100%);
+  }
+  .horizon .water{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:22%;
+    background:linear-gradient(180deg, #0a1a30, #06101f);
+  }
+  .horizon .shimmer{
+    position:absolute;
+    left:38%; right:38%; bottom:0;
+    height:22%;
+    background:linear-gradient(180deg, rgba(242,230,201,0.35), transparent);
+    filter:blur(1px);
+  }
+
+  .moon-scene{
+    position:relative;
+    width:320px;
+    height:320px;
+    z-index:1;
+  }
+  .full-moon{
+    position:absolute;
+    top:50%; left:50%;
+    width:130px;
+    height:130px;
+    margin:-65px 0 0 -65px;
+    border-radius:50%;
+    z-index:2;
+    background:
+      radial-gradient(circle at 30% 65%, rgba(120,95,45,0.35) 0 7px, transparent 8px),
+      radial-gradient(circle at 60% 30%, rgba(120,95,45,0.3) 0 10px, transparent 11px),
+      radial-gradient(circle at 70% 68%, rgba(120,95,45,0.25) 0 6px, transparent 7px),
+      radial-gradient(circle at 40% 20%, rgba(120,95,45,0.2) 0 5px, transparent 6px),
+      radial-gradient(circle at 22% 78%, rgba(120,95,45,0.2) 0 4px, transparent 5px),
+      radial-gradient(circle at 45% 48%, #fdf6e3 0%, #f2e6c9 55%, #e0c98a 100%);
+    box-shadow:0 0 50px 14px rgba(242,230,201,0.55), 0 0 120px 45px rgba(242,230,201,0.22);
+    animation:moonGlow 3.4s ease-in-out infinite;
+  }
+  #gate:hover .full-moon{ filter:brightness(1.08); }
+  .gate-title{
+    font-family:'Limelight', cursive;
+    font-size:26px;
+    font-weight:400;
+    letter-spacing:1px;
+    color:var(--cream, #f5ecd6);
+    margin:0;
+    text-shadow:0 0 20px rgba(248,236,200,0.5);
+  }
+  .big-emoji-inline{
+    display:inline-block;
+    font-size:1.8em;
+    vertical-align:middle;
+    line-height:1;
+  }
+  @keyframes moonGlow{
+    0%,100%{ box-shadow:0 0 50px 14px rgba(242,230,201,0.5), 0 0 120px 45px rgba(242,230,201,0.2); }
+    50%{ box-shadow:0 0 62px 18px rgba(242,230,201,0.65), 0 0 140px 55px rgba(242,230,201,0.3); }
+  }
+  .orbit-ring{
+    position:absolute;
+    top:50%; left:50%;
+    width:300px; height:300px;
+    margin:-150px 0 0 -150px;
+    border-radius:50%;
+    border:1px dashed rgba(242,230,201,0.25);
+    transform:scaleY(0.41);
+  }
+  .earth-wrapper{
+    position:absolute;
+    top:50%; left:50%;
+    width:0; height:0;
+    z-index:3;
+  }
+  .earth{
+    position:relative;
+    width:42px;
+    height:42px;
+    margin:-21px 0 0 -21px;
+    border-radius:50%;
+    overflow:hidden;
+    box-shadow:0 0 14px 4px rgba(100,180,255,0.55), inset -7px -7px 12px rgba(0,5,20,0.45);
+  }
+  .earth-texture{
+    position:absolute;
+    top:0; left:0;
+    width:200%;
+    height:100%;
+    background-repeat:repeat-x;
+    background-size:50% 100%;
+    background-image:
+      radial-gradient(circle at 10% 30%, #5b8a4f 0 14%, transparent 15%),
+      radial-gradient(circle at 25% 62%, #6b9c55 0 10%, transparent 11%),
+      radial-gradient(circle at 40% 18%, #7a5c3e 0 8%, transparent 9%),
+      radial-gradient(circle at 55% 55%, #5b8a4f 0 12%, transparent 13%),
+      radial-gradient(circle at 70% 22%, #6b9c55 0 9%, transparent 10%),
+      radial-gradient(circle at 85% 65%, #7a5c3e 0 11%, transparent 12%),
+      linear-gradient(#3f95e0, #16407a);
+    animation:earthSpin 6s linear infinite;
+  }
+  @keyframes earthSpin{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  .earth-shade{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 30% 26%, rgba(255,255,255,0.55), transparent 38%),
+      radial-gradient(circle at 74% 76%, rgba(4,8,22,0.6), transparent 55%);
+    pointer-events:none;
+  }
+  .earth-label{
+    position:absolute;
+    top:26px; left:50%;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-family:'Limelight', cursive;
+    font-size:11px;
+    letter-spacing:0.5px;
+    color:#fdf6e3;
+    background:rgba(10,16,32,0.55);
+    padding:2px 8px;
+    border-radius:10px;
+    text-shadow:0 1px 2px rgba(0,0,0,0.6);
+  }
+  #gate p{
+    position:relative;
+    z-index:2;
+    font-family:'Limelight', cursive;
+    font-size:16px;
+    letter-spacing:1px;
+    color:var(--cream-dim);
+    opacity:0.85;
+    animation:pulseText 2.2s ease-in-out infinite;
+  }
+  @keyframes pulseText{
+    0%,100%{ opacity:0.5; }
+    50%{ opacity:1; }
+  }
+
+  .wrap{
+    max-width:540px;
+    width:100%;
+    margin:0 auto;
+  }
+  .card{
+    background:linear-gradient(160deg, rgba(26,34,66,0.82), rgba(10,14,30,0.9));
+    color:var(--lavender);
+    border-radius:24px;
+    padding:38px 30px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.55), 0 0 50px rgba(120,140,255,0.06);
+    border:1px solid rgba(242,200,121,0.18);
+    backdrop-filter:blur(10px);
+    position:relative;
+  }
+  .mini-moon{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    margin:0 auto 14px;
+    background:radial-gradient(circle at 35% 35%, var(--cream) 0%, var(--gold) 60%, var(--gold-deep) 100%);
+    box-shadow:0 0 18px 5px rgba(242,200,121,0.5);
+  }
+
+  h1{
+    font-family:'Limelight', cursive;
+    font-size:27px;
+    margin:6px 0 16px;
+    color:var(--cream);
+    font-weight:400;
+    letter-spacing:0.5px;
+  }
+  h1 .name{ color:var(--gold); }
+  p.sub{
+    font-size:14.5px;
+    line-height:1.75;
+    color:var(--lavender-dim);
+    margin:0 0 26px;
+  }
+  .btn-row{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    min-height:56px;
+  }
+  .btn-row button{
+    width:100%;
+    max-width:260px;
+  }
+  button{
+    border:none;
+    cursor:pointer;
+    font-family:'Quicksand', sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    padding:13px 24px;
+    border-radius:50px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #yesBtn{
+    background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+    color:#2a1c0a;
+    box-shadow:0 8px 20px rgba(202,160,81,0.4);
+  }
+  #yesBtn:hover{ transform:scale(1.05); }
+  #noBtn{
+    background:transparent;
+    color:var(--lavender-dim);
+    border:2px solid rgba(216,220,240,0.25);
+    position:relative;
+  }
+  #noBtn:hover{ background:rgba(216,220,240,0.06); }
+  .fact{
+    margin-top:24px;
+    font-size:12px;
+    color:var(--lavender-dim);
+    opacity:0.75;
+    font-style:italic;
+  }
+
+  /* Stage 2 options */
+  #stage2 h2{
+    font-family:'Limelight', cursive;
+    font-weight:400;
+    color:var(--cream);
+    font-size:21px;
+    margin:6px 0 8px;
+  }
+  #stage2 .tagline{
+    font-size:13px;
+    color:var(--lavender-dim);
+    margin-bottom:20px;
+  }
+  .options{
+    display:grid;
+    gap:11px;
+    text-align:left;
+    margin-bottom:22px;
+  }
+  .option{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:rgba(255,255,255,0.04);
+    border:2px solid rgba(242,200,121,0.15);
+    border-radius:14px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+    font-size:14px;
+    color:var(--lavender);
+  }
+  .option:hover{
+    border-color:var(--gold);
+    background:rgba(242,200,121,0.08);
+  }
+  .option input{
+    accent-color:var(--gold-deep);
+    width:17px;
+    height:17px;
+  }
+  .option span.emoji{ font-size:19px; }
+
+  .daytime{
+    margin-bottom:20px;
+    text-align:left;
+  }
+  .daytime > p, #fixedDateNote{
+    font-weight:700;
+    color:var(--cream);
+    font-size:14px;
+    margin-bottom:9px;
+  }
+  #fixedDateNote{
+    background:rgba(242,200,121,0.08);
+    border:1.5px dashed var(--gold);
+    padding:9px 12px;
+    border-radius:12px;
+  }
+  #calendarDate{
+    width:100%;
+    padding:10px 14px;
+    border-radius:12px;
+    border:2px solid rgba(242,200,121,0.18);
+    font-size:14px;
+    color:var(--lavender);
+    font-family:inherit;
+    background:rgba(255,255,255,0.04);
+    color-scheme:dark;
+  }
+  .time-select{
+    display:flex;
+    gap:9px;
+  }
+  .time-select select{
+    flex:1;
+    padding:10px 6px;
+    border-radius:12px;
+    border:2px solid rgba(242,200,121,0.18);
+    font-size:14px;
+    color:var(--lavender);
+    font-family:inherit;
+    background:rgba(255,255,255,0.04);
+    color-scheme:dark;
+  }
+  .hidden{ display:none !important; }
+
+  #confirmBtn{
+    background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+    color:#2a1c0a;
+    width:100%;
+    box-shadow:0 8px 20px rgba(202,160,81,0.4);
+  }
+  #confirmBtn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  #stage3 h2{
+    font-family:'Limelight', cursive;
+    font-weight:400;
+    color:var(--cream);
+    font-size:23px;
+    margin-bottom:10px;
+  }
+  #stage3 p{
+    color:var(--lavender-dim);
+    font-size:14.5px;
+    line-height:1.7;
+  }
+  .big-icon{ font-size:44px; margin-bottom:8px; }
+</style>
+</head>
+<body>
+
+<div class="vignette"></div>
+<div class="site-stars" id="siteStars"></div>
+<div class="moonfield" id="moonfield"></div>
+<div id="iris"></div>
+
+<!-- Gate screen -->
+<div class="screen" id="gate" onclick="enterSite()">
+  <div class="gate-stars" id="gateStars"></div>
+  <div class="horizon">
+    <div class="ridge back"></div>
+    <div class="ridge front"></div>
+    <div class="water"></div>
+    <div class="shimmer"></div>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:22px; position:relative; z-index:2;">
+    <h1 class="gate-title">Welcome in <span class="big-emoji-inline">🧙‍♀️🌙</span></h1>
+    <div class="moon-scene">
+      <div class="full-moon"></div>
+      <div class="orbit-ring"></div>
+      <div class="earth-wrapper" id="earthWrapper">
+        <div class="earth">
+          <div class="earth-texture"></div>
+          <div class="earth-shade"></div>
+        </div>
+        <div class="earth-label">me</div>
+      </div>
+    </div>
+    <p><span class="big-emoji-inline">🪄</span> Click here and all shall be revealed <span class="big-emoji-inline">🪄</span></p>
+  </div>
+</div>
+
+<!-- Stage 1: The Ask -->
+<div class="screen hidden" id="stage1">
+  <div class="wrap">
+    <div class="card">
+      <div class="mini-moon"></div>
+      <h1>Hey <span class="name">Indu</span> 🌙</h1>
+      <p class="sub">
+        We've been good friends for a while now and while i love our friendship and want to preserve it BUT, there's always this "what if" I keep
+        coming back to. Figured it's about time I actually find out instead of just wondering.
+        <br><br>
+        Will the goddess of the moon grant this mortal a chance to earn her favor? 😉😂
+      </p>
+      <div class="btn-row">
+        <button id="yesBtn" onclick="showStage2()">Yeah, let's do it 🌙</button>
+        <button id="noBtn" onmouseover="dodge()" ontouchstart="dodge()">Nah, I am alright</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 2: Pick the plan -->
+<div class="screen hidden" id="stage2">
+  <div class="wrap">
+    <div class="card">
+      <div class="big-icon">🌙</div>
+      <h2>Okay, here's what I'm thinking:</h2>
+      <p class="tagline">pick your fate (Good music is mandatory as always lol)</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="dateChoice" value="surprise">
+          <span class="emoji">🎁</span> Surprise date, August 28th &mdash; I've already got it planned, you just pull up at 5pm looking cute
+        </label>
+        <label class="option">
+          <input type="radio" name="dateChoice" value="meowwolf">
+          <span class="emoji">🍄</span> Get a little "elevated", then go get lost inside Meow Wolf
+        </label>
+        <label class="option">
+          <input type="radio" name="dateChoice" value="dinner-movie">
+          <span class="emoji">🍝</span> I attempt to cook, we watch a movie, and catch up on all the music we want to share
+        </label>
+        <label class="option">
+          <input type="radio" name="dateChoice" value="aquarium-dinner">
+          <span class="emoji">🐠</span> Dallas Aquarium, then dinner after
+        </label>
+      </div>
+
+      <div class="daytime">
+        <div id="fixedDateNote" class="hidden">📅 Friday, August 28th &mdash; it's happening either way, just need your time (after 5:00pm)</div>
+        <div id="fullDatePicker">
+          <p>When works for you?</p>
+          <input type="date" id="calendarDate" min="2026-08-18">
+        </div>
+        <div class="time-select" style="margin-top:10px;">
+          <select id="hourSelect">
+            <option value="">Hour</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+            <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+          </select>
+          <select id="minuteSelect">
+            <option value="">Min</option>
+            <option value="00">00</option>
+            <option value="15">15</option>
+            <option value="30">30</option>
+            <option value="45">45</option>
+          </select>
+          <select id="periodSelect">
+            <option value="">AM/PM</option>
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="confirmBtn" onclick="showStage3()" disabled>Lock it in 🌙</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stage 3: Confirmation -->
+<div class="screen hidden" id="stage3">
+  <div class="wrap">
+    <div class="card">
+      <div class="big-icon">🌙</div>
+      <h2>It's set.</h2>
+      <p id="finalMsg"></p>
+      <p style="margin-top:16px; font-size:12px; color:var(--lavender-dim); opacity:0.75;">
+        &mdash; will text you the details shortly!
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Same Formspree endpoint as the other pages — "from" field tags it as Indu.
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xzdnerkr";
+
+  // Dhairya (earth) orbiting the moon — JS-driven ellipse with a depth illusion
+  const earthWrapper = document.getElementById('earthWrapper');
+  const orbitRadiusX = 150;
+  const orbitRadiusY = 62;
+  const orbitPeriod = 7000; // ms
+  function animateOrbit(ts){
+    const angle = ((ts % orbitPeriod) / orbitPeriod) * Math.PI * 2;
+    const x = Math.cos(angle) * orbitRadiusX;
+    const y = Math.sin(angle) * orbitRadiusY;
+    const depth = (Math.sin(angle) + 1) / 2; // 0 = farthest (behind moon), 1 = closest (in front)
+    const scale = 0.75 + depth * 0.4;
+    earthWrapper.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    earthWrapper.style.zIndex = depth > 0.35 ? 3 : 0;
+    requestAnimationFrame(animateOrbit);
+  }
+  requestAnimationFrame(animateOrbit);
+
+  // twinkling stars on the gate screen
+  const gateStars = document.getElementById('gateStars');
+  for(let i=0;i<70;i++){
+    const s = document.createElement('div');
+    s.className = 'gate-star';
+    const size = 1 + Math.random()*2;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*68+'%';
+    s.style.animationDuration = (2+Math.random()*3)+'s';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    gateStars.appendChild(s);
+  }
+
+  // twinkling stars across the rest of the site, for consistency with the gate
+  const siteStars = document.getElementById('siteStars');
+  for(let i=0;i<90;i++){
+    const s = document.createElement('div');
+    s.className = 'site-star';
+    const size = 1 + Math.random()*1.8;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDuration = (2.5+Math.random()*3.5)+'s';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    siteStars.appendChild(s);
+  }
+
+  // scattered background moon phases
+  const moonfield = document.getElementById('moonfield');
+  for(let i=0;i<14;i++){
+    const p = document.createElement('div');
+    p.className = 'phase';
+    const size = 20 + Math.random()*50;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = Math.random()*100+'%';
+    p.style.top = Math.random()*100+'%';
+    p.style.boxShadow = `${size*0.35}px 0 0 0 #04060f`;
+    p.style.animationDuration = (6+Math.random()*6)+'s';
+    p.style.animationDelay = (Math.random()*5)+'s';
+    moonfield.appendChild(p);
+  }
+
+  // iris transition between screens
+  const iris = document.getElementById('iris');
+  function irisTransition(hideId, showId){
+    iris.classList.add('closing');
+    setTimeout(() => {
+      document.getElementById(hideId).classList.add('hidden');
+      document.getElementById(showId).classList.remove('hidden');
+      iris.classList.remove('closing');
+      iris.classList.add('opening');
+      setTimeout(() => iris.classList.remove('opening'), 600);
+    }, 550);
+  }
+
+  function enterSite(){
+    irisTransition('gate', 'stage1');
+  }
+
+  function showStage2(){
+    irisTransition('stage1', 'stage2');
+  }
+
+  // dodging "no" button
+  const noBtn = document.getElementById('noBtn');
+  function dodge(){
+    const maxX = 90, maxY = 40;
+    const x = (Math.random()*2-1)*maxX;
+    const y = (Math.random()*2-1)*maxY;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  const confirmBtn = document.getElementById('confirmBtn');
+  const calendarDate = document.getElementById('calendarDate');
+  const hourSelect = document.getElementById('hourSelect');
+  const minuteSelect = document.getElementById('minuteSelect');
+  const periodSelect = document.getElementById('periodSelect');
+  const fixedDateNote = document.getElementById('fixedDateNote');
+  const fullDatePicker = document.getElementById('fullDatePicker');
+
+  function updateFormMode(){
+    const checked = document.querySelector('input[name="dateChoice"]:checked');
+    const isSurprise = checked && checked.value === 'surprise';
+    fixedDateNote.classList.toggle('hidden', !isSurprise);
+    fullDatePicker.classList.toggle('hidden', isSurprise);
+
+    const amOption = periodSelect.querySelector('option[value="AM"]');
+    amOption.disabled = isSurprise;
+    if(isSurprise) periodSelect.value = 'PM';
+
+    for(const opt of hourSelect.options){
+      if(!opt.value) continue;
+      opt.disabled = isSurprise && parseInt(opt.value) < 5;
+    }
+    checkReady();
+  }
+
+  function checkReady(){
+    const checked = document.querySelector('input[name="dateChoice"]:checked');
+    const isSurprise = checked && checked.value === 'surprise';
+    const dateOk = isSurprise ? true : !!calendarDate.value;
+    const timePicked = hourSelect.value && minuteSelect.value && periodSelect.value;
+    confirmBtn.disabled = !(checked && dateOk && timePicked);
+  }
+
+  document.querySelectorAll('input[name="dateChoice"]').forEach(r => r.addEventListener('change', updateFormMode));
+  calendarDate.addEventListener('change', checkReady);
+  [hourSelect, minuteSelect, periodSelect].forEach(s => s.addEventListener('change', checkReady));
+
+  function getSelectedTime(){
+    return `${hourSelect.value}:${minuteSelect.value} ${periodSelect.value}`;
+  }
+
+  function getSelectedDate(){
+    const checked = document.querySelector('input[name="dateChoice"]:checked');
+    if(checked && checked.value === 'surprise') return 'Friday, August 28th';
+    if(!calendarDate.value) return '';
+    const [y, m, d] = calendarDate.value.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+
+  const messages = {
+    surprise: "already got it planned, august 28th, you just gotta pull up 🎁🌙",
+    meowwolf: "we're recreating dream emporium🍄🎨",
+    "dinner-movie": "get ready for paneer chilli and the flume mixtape🍝🎧",
+    "aquarium-dinner": "by the end the local octopus will recognize us 🐠🍽️"
+  };
+
+  const activityLabels = {
+    surprise: "Surprise day, August 28th",
+    meowwolf: "Getting elevated + Meow Wolf",
+    "dinner-movie": "Home-cooked dinner + movie & music night",
+    "aquarium-dinner": "Dallas Aquarium + dinner"
+  };
+
+  function sendToFormspree(payload){
+    if(!FORMSPREE_ENDPOINT || FORMSPREE_ENDPOINT.includes('REPLACE_ME')) return;
+    fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error('Could not send email:', err));
+  }
+
+  function showStage3(){
+    const choice = document.querySelector('input[name="dateChoice"]:checked').value;
+    const day = getSelectedDate();
+    const time = getSelectedTime();
+    document.getElementById('finalMsg').textContent = `${day}, ${time} — ${messages[choice]}`;
+    irisTransition('stage2', 'stage3');
+
+    sendToFormspree({
+      subject: "Indu said yes! 🌙",
+      from: "Indu",
+      answer: "Yes",
+      activity: activityLabels[choice],
+      day: day,
+      time: time,
+      message: `Indu picked: "${activityLabels[choice]}" on ${day} at ${time}.`
+    });
+  }
+</script>
+
+</body>
+</html>

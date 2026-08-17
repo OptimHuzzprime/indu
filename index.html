@@ -687,10 +687,10 @@
   // dodging "no" button
   const noBtn = document.getElementById('noBtn');
   function dodge(){
-    const maxX = 90, maxY = 40;
-    const x = (Math.random()*2-1)*maxX;
-    const y = (Math.random()*2-1)*maxY;
-    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  const maxX = 70;
+  const x = (Math.random()*2-1)*maxX;
+  const y = 8 + Math.random()*22; // only ever shifts down/sideways, never up into the button above
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
   }
 
   const confirmBtn = document.getElementById('confirmBtn');

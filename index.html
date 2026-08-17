@@ -544,7 +544,7 @@
       <div class="options">
         <label class="option">
           <input type="radio" name="dateChoice" value="surprise">
-          <span class="emoji">🎁</span> Surprise date, August 28th &mdash; I've already got it planned, you just pull up at 5pm looking cute
+          <span class="emoji">👑</span> Princess treatment &mdash; I come pick you up, the activity's a surprise, all you gotta do is dress cute
         </label>
         <label class="option">
           <input type="radio" name="dateChoice" value="meowwolf">
@@ -561,7 +561,6 @@
       </div>
 
       <div class="daytime">
-        <div id="fixedDateNote" class="hidden">📅 Friday, August 28th &mdash; it's happening either way, just need your time (after 5:00pm)</div>
         <div id="fullDatePicker">
           <p>When works for you?</p>
           <input type="date" id="calendarDate" min="2026-08-18">
@@ -714,35 +713,15 @@
   const hourSelect = document.getElementById('hourSelect');
   const minuteSelect = document.getElementById('minuteSelect');
   const periodSelect = document.getElementById('periodSelect');
-  const fixedDateNote = document.getElementById('fixedDateNote');
-  const fullDatePicker = document.getElementById('fullDatePicker');
-
-  function updateFormMode(){
-    const checked = document.querySelector('input[name="dateChoice"]:checked');
-    const isSurprise = checked && checked.value === 'surprise';
-    fixedDateNote.classList.toggle('hidden', !isSurprise);
-    fullDatePicker.classList.toggle('hidden', isSurprise);
-
-    const amOption = periodSelect.querySelector('option[value="AM"]');
-    amOption.disabled = isSurprise;
-    if(isSurprise) periodSelect.value = 'PM';
-
-    for(const opt of hourSelect.options){
-      if(!opt.value) continue;
-      opt.disabled = isSurprise && parseInt(opt.value) < 5;
-    }
-    checkReady();
-  }
 
   function checkReady(){
     const checked = document.querySelector('input[name="dateChoice"]:checked');
-    const isSurprise = checked && checked.value === 'surprise';
-    const dateOk = isSurprise ? true : !!calendarDate.value;
+    const dateOk = !!calendarDate.value;
     const timePicked = hourSelect.value && minuteSelect.value && periodSelect.value;
     confirmBtn.disabled = !(checked && dateOk && timePicked);
   }
 
-  document.querySelectorAll('input[name="dateChoice"]').forEach(r => r.addEventListener('change', updateFormMode));
+  document.querySelectorAll('input[name="dateChoice"]').forEach(r => r.addEventListener('change', checkReady));
   calendarDate.addEventListener('change', checkReady);
   calendarDate.addEventListener('input', checkReady);
   [hourSelect, minuteSelect, periodSelect].forEach(s => s.addEventListener('change', checkReady));
@@ -752,8 +731,6 @@
   }
 
   function getSelectedDate(){
-    const checked = document.querySelector('input[name="dateChoice"]:checked');
-    if(checked && checked.value === 'surprise') return 'Friday, August 28th';
     if(!calendarDate.value) return '';
     const [y, m, d] = calendarDate.value.split('-').map(Number);
     const dateObj = new Date(y, m - 1, d);
@@ -761,14 +738,14 @@
   }
 
   const messages = {
-    surprise: "already got it planned, august 28th, you just gotta pull up 🎁🌙",
+    surprise: "i'll swing by, you won't know where we're going till we're there, just look cute and trust me 👑🌙",
     meowwolf: "we're recreating dream emporium🍄🎨",
     "dinner-movie": "get ready for paneer chilli and the flume mixtape🍝🎧",
     "aquarium-dinner": "by the end the local octopus will recognize us 🐠🍽️"
   };
 
   const activityLabels = {
-    surprise: "Surprise day, August 28th",
+    surprise: "Princess treatment, surprise activity",
     meowwolf: "Getting elevated + Meow Wolf",
     "dinner-movie": "Home-cooked dinner + movie & music night",
     "aquarium-dinner": "Dallas Aquarium + dinner"
